@@ -100,24 +100,29 @@ public class TelaPrincipal extends JFrame {
         side.add(Box.createVerticalStrut(38));
         side.add(label("MENU PRINCIPAL", 10, MUTED));
         side.add(Box.createVerticalStrut(12));
-        nav(side, "▦   Visão geral", "home", "Visão geral");
-        nav(side, "▤   Produtos", "products", "Produtos");
-        nav(side, "⇄   Movimentações", "movements", "Movimentações");
-        nav(side, "⚑   Estoque baixo", "alerts", "Estoque baixo");
+        nav(side, "home", "Visão geral");
+        nav(side, "products", "Produtos");
+        nav(side, "movements", "Movimentações");
+        nav(side, "alerts", "Estoque baixo");
         side.add(Box.createVerticalGlue());
         side.add(label("VERSÃO 1.0 • LOCAL", 10, BLUE));
         return side;
     }
 
-    private void nav(JPanel side, String text, String key, String title) {
-        JButton b = new JButton(text);
-        b.setMaximumSize(new Dimension(210, 45));
+    private void nav(JPanel side, String key, String title) {
+        JButton b = new JButton(title, new FlowIcon(key, BLUE));
+        b.setMaximumSize(new Dimension(210, 46));
+        b.setPreferredSize(new Dimension(196, 46));
         b.setHorizontalAlignment(SwingConstants.LEFT);
+        b.setIconTextGap(14);
         b.setForeground(FG);
         b.setBackground(new Color(10, 16, 30));
         b.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        b.setBorder(new EmptyBorder(12, 10, 12, 8));
+        b.setBorder(new EmptyBorder(12, 12, 12, 8));
         b.setFocusPainted(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setToolTipText(title);
+        b.getAccessibleContext().setAccessibleName(title);
         b.addActionListener(e -> {
             cardLayout.show(pages, key);
             pageTitle.setText(title);
@@ -126,6 +131,68 @@ public class TelaPrincipal extends JFrame {
         });
         side.add(b);
         side.add(Box.createVerticalStrut(5));
+    }
+
+    /**
+     * Ícones vetoriais Java2D, sem fontes externas ou conexão com a internet.
+     */
+    private static final class FlowIcon implements Icon {
+        private final String type;
+        private final Color color;
+
+        private FlowIcon(String type, Color color) {
+            this.type = type;
+            this.color = color;
+        }
+
+        @Override public int getIconWidth() { return 20; }
+        @Override public int getIconHeight() { return 20; }
+
+        @Override
+        public void paintIcon(Component component, Graphics graphics, int x, int y) {
+            Graphics2D g = (Graphics2D) graphics.create();
+            g.translate(x, y);
+            g.setColor(color);
+            g.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            switch (type) {
+                case "home" -> {
+                    g.drawRoundRect(2, 2, 7, 7, 2, 2);
+                    g.drawRoundRect(12, 2, 6, 7, 2, 2);
+                    g.drawRoundRect(2, 12, 7, 6, 2, 2);
+                    g.drawRoundRect(12, 12, 6, 6, 2, 2);
+                }
+                case "products" -> {
+                    g.drawLine(3, 6, 10, 2);
+                    g.drawLine(10, 2, 17, 6);
+                    g.drawLine(3, 6, 10, 10);
+                    g.drawLine(17, 6, 10, 10);
+                    g.drawLine(3, 6, 3, 15);
+                    g.drawLine(17, 6, 17, 15);
+                    g.drawLine(3, 15, 10, 19);
+                    g.drawLine(17, 15, 10, 19);
+                    g.drawLine(10, 10, 10, 19);
+                }
+                case "movements" -> {
+                    g.drawLine(2, 6, 17, 6);
+                    g.drawLine(13, 2, 17, 6);
+                    g.drawLine(13, 10, 17, 6);
+                    g.drawLine(18, 14, 3, 14);
+                    g.drawLine(7, 10, 3, 14);
+                    g.drawLine(7, 18, 3, 14);
+                }
+                case "alerts" -> {
+                    g.drawLine(10, 2, 19, 18);
+                    g.drawLine(19, 18, 1, 18);
+                    g.drawLine(1, 18, 10, 2);
+                    g.drawLine(10, 7, 10, 12);
+                    g.fillOval(9, 15, 2, 2);
+                }
+                default -> g.drawOval(3, 3, 14, 14);
+            }
+            g.dispose();
+        }
     }
 
     private JPanel dashboard() {
