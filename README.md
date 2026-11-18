@@ -20,52 +20,53 @@ Projeto acadêmico de **Programação Orientada a Objetos**, com foco no padrão
 
 O **EstoqueFlow** é uma aplicação Java para cadastrar produtos, registrar entradas e saídas de mercadorias e consultar o histórico de movimentações. A aplicação utiliza um banco de dados **H2 em arquivo**, dispensando a instalação de um servidor de banco de dados.
 
-A interface desktop está sendo desenvolvida em **Java Swing**, com apoio do **Swing UI Designer do IntelliJ IDEA**.
+A interface desktop foi implementada em **Java Swing**, com tema escuro, navegação lateral e dashboard para acompanhamento do estoque.
 
-> **Estado atual:** o núcleo de persistência e movimentações está funcional e foi validado por execuções manuais. A interface gráfica completa ainda está em desenvolvimento.
+> **Estado atual:** o núcleo de persistência e movimentações está implementado. A interface gráfica principal também está implementada, incluindo visão geral, produtos, movimentações e estoque baixo. A compilação Gradle e a abertura da aplicação foram verificadas. Os testes ponta a ponta e automatizados ainda estão pendentes.
 
 ## Funcionalidades
 
 | Recurso | Situação |
 | :-- | :-- |
-| Cadastro de produtos via DAO | ✅ Implementado |
-| Listagem e busca de produtos por código | ✅ Implementado |
+| Cadastro de produtos via DAO e interface | ✅ Implementado |
+| Listagem e pesquisa por código, nome ou categoria | ✅ Implementado |
 | Persistência local com H2 + JDBC | ✅ Implementado |
 | Entrada e saída de mercadorias | ✅ Implementado |
 | Validação de estoque insuficiente | ✅ Implementado |
 | Histórico de movimentações por produto | ✅ Implementado |
 | Transações com `commit` e `rollback` | ✅ Implementado |
-| Tela gráfica completa para operar o sistema | 🚧 Em desenvolvimento |
-| Edição de produtos e pesquisa na interface | 📋 Planejado |
-| Indicadores e alertas visuais de estoque baixo | 📋 Planejado |
+| Interface gráfica com dashboard e navegação lateral | ✅ Implementado |
+| Edição de produtos e ativação/desativação | ✅ Implementado |
+| Indicadores e alertas visuais de estoque baixo | ✅ Implementado |
 
 ## Tecnologias
 
 - **Java 21** — linguagem e regras de negócio
 - **Java Swing** — interface gráfica desktop
-- **IntelliJ IDEA + Swing UI Designer** — ambiente e criação de formulários
 - **Gradle (Groovy DSL)** — build e dependências
 - **H2 Database + JDBC** — armazenamento persistente e acesso SQL
 
 ## Arquitetura
 
-O projeto aplica **MVC (Model–View–Controller)** e utiliza as camadas **Service** e **DAO** para separar as regras de negócio da persistência.
+O projeto utiliza uma organização em camadas, inspirada no padrão **MVC**, com **View**, **Model**, **Service** e **DAO**. A interface Swing acessa os serviços e DAOs diretamente, enquanto as regras de negócio e a persistência permanecem separadas.
 
 ```mermaid
 flowchart TD
     U[Usuário] --> V[View · Swing]
-    V --> C[Controller]
-    C --> S[Service · regras de negócio]
-    S --> D[DAO · JDBC]
+    V --> S[Service · regras de negócio]
+    V --> D[DAO · JDBC]
+    S --> D
     D <--> B[(H2 Database)]
     D --> M[Model · entidades]
     S --> M
 ```
 
-> O diagrama representa a arquitetura-alvo. A conexão da interface com os controllers está em implementação.
+> A tela principal utiliza os serviços e DAOs para apresentar os dados e executar as operações disponíveis.
 
 ### Classes centrais
 
+- `Main` — inicialização da aplicação e abertura da janela principal.
+- `TelaPrincipal` — janela Swing, dashboard, navegação e telas de produtos, movimentações e alertas.
 - `Produto` — código, nome, categoria, preço, quantidade e estoque mínimo.
 - `Movimentacao` e `TipoMovimentacao` — registros de entrada e saída.
 - `ProdutoDAO` e `MovimentacaoDAO` — consultas e comandos SQL.
@@ -86,6 +87,7 @@ O **Gradle Wrapper** acompanha o projeto, então não é necessário instalar o 
 ```powershell
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
+git switch Joao
 .\gradlew.bat clean build
 .\gradlew.bat run
 ```
@@ -95,11 +97,12 @@ cd EstoqueFlow
 ```bash
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
+git switch Joao
 ./gradlew clean build
 ./gradlew run
 ```
 
-> O formulário Swing completo ainda está sendo integrado; até lá, o comando `run` pode abrir a janela inicial de demonstração.
+O comando `run` inicia a aplicação desktop com a interface Swing implementada.
 
 ## Armazenamento
 
@@ -136,8 +139,7 @@ src/main/java/br/com/estoqueflow/
 ├── database/     # DatabaseManager
 ├── dao/          # Acesso aos dados
 ├── service/      # Regras de negócio
-├── controller/   # Comunicação com a interface (em evolução)
-└── view/         # Formulários Swing (em evolução)
+└── view/         # Interface gráfica Swing
 ```
 
 ---
