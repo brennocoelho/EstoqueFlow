@@ -1,0 +1,25 @@
+
+plugins {
+    id 'application'
+}
+
+group = 'br.com.estoqueflow'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencies {
+    implementation 'com.h2database:h2:2.5.252'
+}
+
+application {
+    mainClass = 'br.com.estoqueflow.Main'
+}
