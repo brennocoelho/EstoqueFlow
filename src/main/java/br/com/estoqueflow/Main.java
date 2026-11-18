@@ -1,11 +1,27 @@
 
 package br.com.estoqueflow;
 
+import br.com.estoqueflow.database.DatabaseManager;
+
 import javax.swing.*;
+import java.sql.SQLException;
 
 public class Main {
 
     public static void main(String[] args) {
+
+        try {
+            DatabaseManager.inicializar();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Erro ao inicializar o banco:\n" + e.getMessage(),
+                    "Erro no EstoqueFlow",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
         SwingUtilities.invokeLater(() -> {
             JFrame janela = new JFrame("EstoqueFlow");
 
