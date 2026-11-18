@@ -440,7 +440,11 @@ public class TelaPrincipal extends JFrame {
         if (answer != JOptionPane.OK_OPTION) return;
 
         try {
-            BigDecimal value = new BigDecimal(price.getText().trim().replace(".", "").replace(",", "."));
+            String priceText = price.getText().trim();
+            if (priceText.contains(",")) {
+                priceText = priceText.replace(".", "").replace(",", ".");
+            }
+            BigDecimal value = new BigDecimal(priceText);
             int qty = old == null ? Integer.parseInt(initial.getText().trim()) : old.getQuantidade();
             Produto p = new Produto(old == null ? null : old.getId(), code.getText(),
                     name.getText(), category.getText(), value, qty,

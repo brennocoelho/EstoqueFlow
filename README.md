@@ -22,7 +22,7 @@ O **EstoqueFlow** é uma aplicação Java para cadastrar produtos, registrar ent
 
 A interface desktop foi implementada em **Java Swing**, com tema escuro, navegação lateral e dashboard para acompanhamento do estoque.
 
-> **Estado atual:** o núcleo de persistência e movimentações está implementado. A interface gráfica principal também está implementada, incluindo visão geral, produtos, movimentações e estoque baixo. A compilação Gradle e a abertura da aplicação foram verificadas. Os testes ponta a ponta e automatizados ainda estão pendentes.
+> **Estado atual:** o núcleo de persistência e movimentações está implementado. A interface gráfica principal também está implementada, incluindo visão geral, produtos, movimentações e estoque baixo. A compilação Gradle e a abertura da aplicação foram verificadas. A suíte automatizada cobre entradas, saídas, validações de quantidade, produtos inativos e limites numéricos do estoque.
 
 ## Funcionalidades
 
