@@ -156,10 +156,11 @@ O histórico registra as movimentações válidas. A suíte automatizada JUnit 5
 ```text
 src/main/java/br/com/estoqueflow/
 ├── Main.java
-├── model/        # Produto, Movimentacao e TipoMovimentacao
-├── database/     # DatabaseManager
-├── dao/          # Acesso aos dados
-├── service/      # Regras de negócio
+├── model/        # Entidades: Produto, Movimentacao e TipoMovimentacao
+├── database/     # Gerenciamento do banco de dados H2
+├── dao/          # Acesso e persistência dos dados
+├── service/      # Regras de negócio e validações
+├── controller/   # Controle e coordenação entre View, Service e DAO
 └── view/         # Interface gráfica Swing
 ```
 
