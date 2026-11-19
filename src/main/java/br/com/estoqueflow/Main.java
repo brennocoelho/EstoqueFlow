@@ -1,5 +1,6 @@
 package br.com.estoqueflow;
 
+import br.com.estoqueflow.controller.EstoqueController;
 import br.com.estoqueflow.database.DatabaseManager;
 import br.com.estoqueflow.view.TelaPrincipal;
 
@@ -23,7 +24,7 @@ public class Main {
             } catch (Exception ignored) {
                 // Mantém o Look and Feel padrão caso o tema do sistema não esteja disponível.
             }
-            new TelaPrincipal().setVisible(true);
+            new TelaPrincipal(new EstoqueController()).setVisible(true);
         });
     }
 }

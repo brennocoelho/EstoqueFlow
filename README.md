@@ -49,29 +49,31 @@ A interface desktop foi implementada em **Java Swing**, com tema escuro, navega�
 
 ## Arquitetura
 
-O projeto utiliza uma organização em camadas, inspirada no padrão **MVC**, com **View**, **Model**, **Service** e **DAO**. A interface Swing acessa os serviços e DAOs diretamente, enquanto as regras de negócio e a persistência permanecem separadas.
+O projeto utiliza uma arquitetura em camadas baseada no padrão **MVC (Model-View-Controller)**, separando interface, controle, regras de negócio e persistência.
 
 ```mermaid
 flowchart TD
     U[Usuário] --> V[View · Swing]
-    V --> S[Service · regras de negócio]
-    V --> D[DAO · JDBC]
+    V --> C[Controller · coordenação]
+    C --> S[Service · regras de negócio]
+    C --> D[DAO · consultas e persistência]
     S --> D
     D <--> B[(H2 Database)]
     D --> M[Model · entidades]
     S --> M
+    C --> M
+    M --> V
 ```
-
-> A tela principal utiliza os serviços e DAOs para apresentar os dados e executar as operações disponíveis.
 
 ### Classes centrais
 
-- `Main` — inicialização da aplicação e abertura da janela principal.
-- `TelaPrincipal` — janela Swing, dashboard, navegação e telas de produtos, movimentações e alertas.
-- `Produto` — código, nome, categoria, preço, quantidade e estoque mínimo.
-- `Movimentacao` e `TipoMovimentacao` — registros de entrada e saída.
-- `ProdutoDAO` e `MovimentacaoDAO` — consultas e comandos SQL.
-- `EstoqueService` — operações e validações de estoque, incluindo transações.
+- `Main` — inicialização do banco e abertura da aplicação.
+- `TelaPrincipal` — View Swing responsável pela interface, dashboard e navegação.
+- `EstoqueController` — recebe ações da View e coordena consultas e operações.
+- `Produto` — entidade que representa os produtos.
+- `Movimentacao` e `TipoMovimentacao` — representam as movimentações do estoque.
+- `ProdutoDAO` e `MovimentacaoDAO` — consultas e operações SQL.
+- `EstoqueService` — regras de negócio, validações e transações de estoque.
 - `DatabaseManager` — conexão com o H2 e criação das tabelas.
 
 ## Como executar

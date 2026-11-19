@@ -1,10 +1,8 @@
 package br.com.estoqueflow.view;
 
-import br.com.estoqueflow.dao.MovimentacaoDAO;
-import br.com.estoqueflow.dao.ProdutoDAO;
+import br.com.estoqueflow.controller.EstoqueController;
 import br.com.estoqueflow.model.Movimentacao;
 import br.com.estoqueflow.model.Produto;
-import br.com.estoqueflow.service.EstoqueService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -30,9 +28,7 @@ public class TelaPrincipal extends JFrame {
     private static final NumberFormat MONEY = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    private final ProdutoDAO produtos = new ProdutoDAO();
-    private final MovimentacaoDAO movimentacoes = new MovimentacaoDAO();
-    private final EstoqueService estoque = new EstoqueService();
+    private final EstoqueController controller;
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel pages = new JPanel(cardLayout);
@@ -46,7 +42,12 @@ public class TelaPrincipal extends JFrame {
     private final JTable alertTable = table(alertModel);
 
     public TelaPrincipal() {
+        this(new EstoqueController());
+    }
+
+    public TelaPrincipal(EstoqueController controller) {
         super("EstoqueFlow • Gestão de estoque");
+        this.controller = controller;
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1050, 680));
         setSize(1280, 800);
@@ -412,13 +413,13 @@ public class TelaPrincipal extends JFrame {
     }
 
     private List<Produto> allProducts() throws Exception {
-        return produtos.listarTodos();
+        return controller.listarProdutos();
     }
 
     private void loadProducts() {
         try {
             productModel.setRowCount(0);
-            for (Produto p : produtos.pesquisar(search.getText())) {
+            for (Produto p : controller.pesquisarProdutos(search.getText())) {
                 productModel.addRow(new Object[]{p.getId(), p.getCodigo(), p.getNome(),
                         p.getCategoria(), MONEY.format(p.getPreco()), p.getQuantidade(),
                         p.getEstoqueMinimo(), p.isAtivo() ? "Ativo" : "Inativo"});
@@ -426,26 +427,13 @@ public class TelaPrincipal extends JFrame {
         } catch (Exception e) { error("Não foi possível carregar os produtos.", e); }
     }
 
-    private record MovementRow(Movimentacao movement, String productName) {}
-
-    private List<MovementRow> movementRows() throws Exception {
-        List<MovementRow> rows = new ArrayList<>();
-        for (Produto p : allProducts()) {
-            for (Movimentacao m : movimentacoes.listarPorProduto(p.getId())) {
-                rows.add(new MovementRow(m, p.getNome()));
-            }
-        }
-        rows.sort(Comparator.comparing((MovementRow r) -> r.movement().getDataHora()).reversed());
-        return rows;
-    }
-
     private void loadMovements() {
         try {
             movementModel.setRowCount(0);
-            for (MovementRow r : movementRows()) {
-                Movimentacao m = r.movement();
+            for (EstoqueController.MovimentacaoDetalhe item : controller.listarHistoricoCompleto()) {
+                Movimentacao m = item.movimentacao();
                 movementModel.addRow(new Object[]{m.getDataHora().format(DATE),
-                        r.productName(), m.getTipo(), m.getQuantidade(), m.getObservacao()});
+                        item.nomeProduto(), m.getTipo(), m.getQuantidade(), m.getObservacao()});
             }
         } catch (Exception e) { error("Não foi possível carregar o histórico.", e); }
     }
@@ -482,11 +470,13 @@ public class TelaPrincipal extends JFrame {
             JPanel recentPanel = (JPanel) lower.getComponent(0);
             DefaultTableModel recent = (DefaultTableModel) recentPanel.getClientProperty("recentModel");
             recent.setRowCount(0);
-            List<MovementRow> rows = movementRows();
+            List<EstoqueController.MovimentacaoDetalhe> rows =
+                    controller.listarHistoricoCompleto();
             for (int i = 0; i < Math.min(6, rows.size()); i++) {
-                MovementRow r = rows.get(i);
-                recent.addRow(new Object[]{r.movement().getDataHora().format(DATE),
-                        r.productName(), r.movement().getTipo(), r.movement().getQuantidade()});
+                EstoqueController.MovimentacaoDetalhe item = rows.get(i);
+                Movimentacao m = item.movimentacao();
+                recent.addRow(new Object[]{m.getDataHora().format(DATE),
+                        item.nomeProduto(), m.getTipo(), m.getQuantidade()});
             }
         } catch (Exception e) { error("Não foi possível atualizar o painel.", e); }
     }
@@ -518,7 +508,7 @@ public class TelaPrincipal extends JFrame {
         try {
             Produto p = selectedProduct();
             if (p == null) return;
-            produtos.alterarStatus(p.getId(), !p.isAtivo());
+            controller.alterarStatusProduto(p.getId(), !p.isAtivo());
             refreshAll();
         } catch (Exception e) { error("Não foi possível alterar o status.", e); }
     }
@@ -557,7 +547,7 @@ public class TelaPrincipal extends JFrame {
             Produto p = new Produto(old == null ? null : old.getId(), code.getText(),
                     name.getText(), category.getText(), value, qty,
                     Integer.parseInt(minimum.getText().trim()), active.isSelected());
-            if (old == null) produtos.inserir(p); else produtos.atualizar(p);
+            controller.salvarProduto(p);
             refreshAll();
         } catch (Exception e) { error("Verifique os dados informados.", e); }
     }
@@ -583,8 +573,8 @@ public class TelaPrincipal extends JFrame {
             if (answer != JOptionPane.OK_OPTION) return;
             Produto p = ((ProductOption) choice.getSelectedItem()).product;
             int amount = Integer.parseInt(qty.getText().trim());
-            if (isEntry) estoque.registrarEntrada(p.getId(), amount, note.getText());
-            else estoque.registrarSaida(p.getId(), amount, note.getText());
+            if (isEntry) controller.registrarEntrada(p.getId(), amount, note.getText());
+            else controller.registrarSaida(p.getId(), amount, note.getText());
             refreshAll();
             JOptionPane.showMessageDialog(this, "Movimentação registrada com sucesso.");
         } catch (Exception e) { error("Não foi possível registrar a movimentação.", e); }
