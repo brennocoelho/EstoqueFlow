@@ -1,4 +1,3 @@
-
 plugins {
     id 'application'
 }
@@ -28,4 +27,16 @@ tasks.named('test') {
 
 application {
     mainClass = 'br.com.estoqueflow.Main'
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes(
+                'Main-Class': 'br.com.estoqueflow.Main'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
