@@ -166,5 +166,4 @@ src/main/java/br/com/estoqueflow/
 ---
 
 <div align="center">
-  <sub>EstoqueFlow · Java + MVC · Projeto acadêmico</sub>
 </div>
