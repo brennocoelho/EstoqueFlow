@@ -88,7 +88,6 @@ O **Gradle Wrapper** acompanha o projeto, então não é necessário instalar o 
 ```powershell
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
-git switch Joao
 .\gradlew.bat clean test build
 .\gradlew.bat run
 ```
@@ -98,7 +97,6 @@ git switch Joao
 ```bash
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
-git switch Joao
 bash gradlew clean test build
 bash gradlew run
 ```
