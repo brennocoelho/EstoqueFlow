@@ -8,7 +8,7 @@
 ![Swing](https://img.shields.io/badge/Interface-Java%20Swing-305C79?style=flat-square)
 ![Gradle](https://img.shields.io/badge/Build-Gradle-02303A?style=flat-square&logo=gradle&logoColor=white)
 ![H2](https://img.shields.io/badge/Banco-H2%20Database-36678C?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-yellow?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Pronto%20para%20demonstracao-brightgreen?style=flat-square)
 
 Projeto acadêmico de **Programação Orientada a Objetos**, com foco no padrão **MVC**, separação de responsabilidades e persistência de dados.
 
@@ -20,52 +20,54 @@ Projeto acadêmico de **Programação Orientada a Objetos**, com foco no padrão
 
 O **EstoqueFlow** é uma aplicação Java para cadastrar produtos, registrar entradas e saídas de mercadorias e consultar o histórico de movimentações. A aplicação utiliza um banco de dados **H2 em arquivo**, dispensando a instalação de um servidor de banco de dados.
 
-A interface desktop está sendo desenvolvida em **Java Swing**, com apoio do **Swing UI Designer do IntelliJ IDEA**.
+A interface desktop foi implementada em **Java Swing**, com tema escuro, navegação lateral com ícones vetoriais Java2D e dashboard para acompanhamento do estoque.
 
-> **Estado atual:** o núcleo de persistência e movimentações está funcional e foi validado por execuções manuais. A interface gráfica completa ainda está em desenvolvimento.
+> **Estado atual:** o núcleo de persistência e movimentações está implementado. A interface gráfica principal também está implementada, incluindo visão geral, produtos, movimentações e estoque baixo. A compilação Gradle e a abertura da aplicação foram verificadas. A suíte automatizada cobre entradas, saídas, validações de quantidade, produtos inativos e limites numéricos do estoque.
 
 ## Funcionalidades
 
 | Recurso | Situação |
 | :-- | :-- |
-| Cadastro de produtos via DAO | ✅ Implementado |
-| Listagem e busca de produtos por código | ✅ Implementado |
+| Cadastro de produtos via DAO e interface | ✅ Implementado |
+| Listagem e pesquisa por código, nome ou categoria | ✅ Implementado |
 | Persistência local com H2 + JDBC | ✅ Implementado |
 | Entrada e saída de mercadorias | ✅ Implementado |
 | Validação de estoque insuficiente | ✅ Implementado |
 | Histórico de movimentações por produto | ✅ Implementado |
 | Transações com `commit` e `rollback` | ✅ Implementado |
-| Tela gráfica completa para operar o sistema | 🚧 Em desenvolvimento |
-| Edição de produtos e pesquisa na interface | 📋 Planejado |
-| Indicadores e alertas visuais de estoque baixo | 📋 Planejado |
+| Interface gráfica com dashboard e navegação lateral | ✅ Implementado |
+| Edição de produtos e ativação/desativação | ✅ Implementado |
+| Indicadores e alertas visuais de estoque baixo | ✅ Implementado |
 
 ## Tecnologias
 
 - **Java 21** — linguagem e regras de negócio
 - **Java Swing** — interface gráfica desktop
-- **IntelliJ IDEA + Swing UI Designer** — ambiente e criação de formulários
 - **Gradle (Groovy DSL)** — build e dependências
 - **H2 Database + JDBC** — armazenamento persistente e acesso SQL
+- **JUnit 5** — testes automatizados
 
 ## Arquitetura
 
-O projeto aplica **MVC (Model–View–Controller)** e utiliza as camadas **Service** e **DAO** para separar as regras de negócio da persistência.
+O projeto utiliza uma organização em camadas, inspirada no padrão **MVC**, com **View**, **Model**, **Service** e **DAO**. A interface Swing acessa os serviços e DAOs diretamente, enquanto as regras de negócio e a persistência permanecem separadas.
 
 ```mermaid
 flowchart TD
     U[Usuário] --> V[View · Swing]
-    V --> C[Controller]
-    C --> S[Service · regras de negócio]
-    S --> D[DAO · JDBC]
+    V --> S[Service · regras de negócio]
+    V --> D[DAO · JDBC]
+    S --> D
     D <--> B[(H2 Database)]
     D --> M[Model · entidades]
     S --> M
 ```
 
-> O diagrama representa a arquitetura-alvo. A conexão da interface com os controllers está em implementação.
+> A tela principal utiliza os serviços e DAOs para apresentar os dados e executar as operações disponíveis.
 
 ### Classes centrais
 
+- `Main` — inicialização da aplicação e abertura da janela principal.
+- `TelaPrincipal` — janela Swing, dashboard, navegação e telas de produtos, movimentações e alertas.
 - `Produto` — código, nome, categoria, preço, quantidade e estoque mínimo.
 - `Movimentacao` e `TipoMovimentacao` — registros de entrada e saída.
 - `ProdutoDAO` e `MovimentacaoDAO` — consultas e comandos SQL.
@@ -86,7 +88,7 @@ O **Gradle Wrapper** acompanha o projeto, então não é necessário instalar o 
 ```powershell
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
-.\gradlew.bat clean build
+.\gradlew.bat clean test build
 .\gradlew.bat run
 ```
 
@@ -95,11 +97,11 @@ cd EstoqueFlow
 ```bash
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
-./gradlew clean build
-./gradlew run
+bash gradlew clean test build
+bash gradlew run
 ```
 
-> O formulário Swing completo ainda está sendo integrado; até lá, o comando `run` pode abrir a janela inicial de demonstração.
+O comando `run` inicia a aplicação desktop com a interface Swing implementada.
 
 ## Armazenamento
 
@@ -113,6 +115,26 @@ No Windows, isso corresponde a `%USERPROFILE%\EstoqueFlow\data\estoque.mv.db`.
 
 Os dados permanecem disponíveis após fechar e reabrir o aplicativo. **O arquivo do banco não deve ser enviado ao GitHub**; cada máquina utilizará seu próprio banco local.
 
+## Testes automatizados
+
+A suíte JUnit 5 cobre cinco cenários:
+
+- Registro de entrada e saída com atualização do histórico.
+- Rejeição de saída maior que o saldo, sem alterar o estoque.
+- Rejeição de quantidade zero ou negativa.
+- Bloqueio de movimentação de produto inativo.
+- Proteção contra estouro numérico sem perda do saldo.
+
+Execute com `bash gradlew test` no Linux ou `gradlew.bat test` no Windows.
+
+## Distribuição para apresentação
+
+Gere a distribuição com `bash gradlew clean test installDist` no Linux ou `gradlew.bat clean test installDist` no Windows.
+
+Os arquivos serão gerados em `build/install/EstoqueFlow/`. Execute `build/install/EstoqueFlow/bin/EstoqueFlow` no Linux ou `build\\install\\EstoqueFlow\\bin\\EstoqueFlow.bat` no Windows.
+
+Copie a pasta `EstoqueFlow` inteira, incluindo `bin` e `lib`. O computador de apresentação precisa ter Java 21 instalado. Não é necessário instalar Gradle nem utilizar uma IDE.
+
 ## Demonstração do núcleo de estoque
 
 Os testes manuais já confirmaram o seguinte cenário:
@@ -125,7 +147,7 @@ Tentativa de saída de 99999 unidades: rejeitada
 Saldo final: 15
 ```
 
-O histórico registra as movimentações válidas. As classes `TestePersistencia` e `TesteMovimentacoes` foram usadas durante o desenvolvimento; elas não constituem uma suíte automatizada de testes.
+O histórico registra as movimentações válidas. A suíte automatizada JUnit 5 valida as regras centrais do serviço de estoque.
 
 ## Estrutura do código
 
@@ -136,8 +158,7 @@ src/main/java/br/com/estoqueflow/
 ├── database/     # DatabaseManager
 ├── dao/          # Acesso aos dados
 ├── service/      # Regras de negócio
-├── controller/   # Comunicação com a interface (em evolução)
-└── view/         # Formulários Swing (em evolução)
+└── view/         # Interface gráfica Swing
 ```
 
 ---
