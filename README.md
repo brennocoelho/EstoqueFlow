@@ -8,7 +8,7 @@
 ![Swing](https://img.shields.io/badge/Interface-Java%20Swing-305C79?style=flat-square)
 ![Gradle](https://img.shields.io/badge/Build-Gradle-02303A?style=flat-square&logo=gradle&logoColor=white)
 ![H2](https://img.shields.io/badge/Banco-H2%20Database-36678C?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-yellow?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Pronto%20para%20demonstracao-brightgreen?style=flat-square)
 
 Projeto acadêmico de **Programação Orientada a Objetos**, com foco no padrão **MVC**, separação de responsabilidades e persistência de dados.
 
@@ -45,6 +45,7 @@ A interface desktop foi implementada em **Java Swing**, com tema escuro, navega�
 - **Java Swing** — interface gráfica desktop
 - **Gradle (Groovy DSL)** — build e dependências
 - **H2 Database + JDBC** — armazenamento persistente e acesso SQL
+- **JUnit 5** — testes automatizados
 
 ## Arquitetura
 
@@ -88,7 +89,7 @@ O **Gradle Wrapper** acompanha o projeto, então não é necessário instalar o 
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
 git switch Joao
-.\gradlew.bat clean build
+.\gradlew.bat clean test build
 .\gradlew.bat run
 ```
 
@@ -98,8 +99,8 @@ git switch Joao
 git clone https://github.com/brennocoelho/EstoqueFlow.git
 cd EstoqueFlow
 git switch Joao
-./gradlew clean build
-./gradlew run
+bash gradlew clean test build
+bash gradlew run
 ```
 
 O comando `run` inicia a aplicação desktop com a interface Swing implementada.
@@ -116,6 +117,26 @@ No Windows, isso corresponde a `%USERPROFILE%\EstoqueFlow\data\estoque.mv.db`.
 
 Os dados permanecem disponíveis após fechar e reabrir o aplicativo. **O arquivo do banco não deve ser enviado ao GitHub**; cada máquina utilizará seu próprio banco local.
 
+## Testes automatizados
+
+A suíte JUnit 5 cobre cinco cenários:
+
+- Registro de entrada e saída com atualização do histórico.
+- Rejeição de saída maior que o saldo, sem alterar o estoque.
+- Rejeição de quantidade zero ou negativa.
+- Bloqueio de movimentação de produto inativo.
+- Proteção contra estouro numérico sem perda do saldo.
+
+Execute com `bash gradlew test` no Linux ou `gradlew.bat test` no Windows.
+
+## Distribuição para apresentação
+
+Gere a distribuição com `bash gradlew clean test installDist` no Linux ou `gradlew.bat clean test installDist` no Windows.
+
+Os arquivos serão gerados em `build/install/EstoqueFlow/`. Execute `build/install/EstoqueFlow/bin/EstoqueFlow` no Linux ou `build\\install\\EstoqueFlow\\bin\\EstoqueFlow.bat` no Windows.
+
+Copie a pasta `EstoqueFlow` inteira, incluindo `bin` e `lib`. O computador de apresentação precisa ter Java 21 instalado. Não é necessário instalar Gradle nem utilizar uma IDE.
+
 ## Demonstração do núcleo de estoque
 
 Os testes manuais já confirmaram o seguinte cenário:
@@ -128,7 +149,7 @@ Tentativa de saída de 99999 unidades: rejeitada
 Saldo final: 15
 ```
 
-O histórico registra as movimentações válidas. As classes `TestePersistencia` e `TesteMovimentacoes` foram usadas durante o desenvolvimento; elas não constituem uma suíte automatizada de testes.
+O histórico registra as movimentações válidas. A suíte automatizada JUnit 5 valida as regras centrais do serviço de estoque.
 
 ## Estrutura do código
 
