@@ -94,7 +94,12 @@ public class TelaPrincipal extends JFrame {
         side.setPreferredSize(new Dimension(230, 0));
         side.setBorder(new EmptyBorder(26, 17, 22, 17));
         side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
-        side.add(label("◆  EstoqueFlow", 21, FG));
+        JLabel brand = new JLabel("EstoqueFlow", new BrandIcon(), SwingConstants.LEFT);
+        brand.setFont(new Font("SansSerif", Font.BOLD, 20));
+        brand.setForeground(FG);
+        brand.setIconTextGap(11);
+        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
+        side.add(brand);
         side.add(Box.createVerticalStrut(8));
         side.add(label("GESTÃO DE ESTOQUE", 10, MUTED));
         side.add(Box.createVerticalStrut(38));
@@ -191,6 +196,42 @@ public class TelaPrincipal extends JFrame {
                 }
                 default -> g.drawOval(3, 3, 14, 14);
             }
+            g.dispose();
+        }
+    }
+
+    /**
+     * Ícone vetorial da identidade visual do EstoqueFlow.
+     */
+    private static final class BrandIcon implements Icon {
+        @Override public int getIconWidth() { return 30; }
+        @Override public int getIconHeight() { return 30; }
+
+        @Override
+        public void paintIcon(Component component, Graphics graphics, int x, int y) {
+            Graphics2D g = (Graphics2D) graphics.create();
+            g.translate(x, y);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g.setPaint(new GradientPaint(2, 2, new Color(56, 189, 248),
+                    28, 28, new Color(14, 165, 233)));
+            g.fillRoundRect(1, 1, 28, 28, 9, 9);
+
+            g.setColor(Color.WHITE);
+            g.setStroke(new BasicStroke(1.7f,
+                    BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+            g.drawLine(7, 11, 15, 7);
+            g.drawLine(15, 7, 23, 11);
+            g.drawLine(7, 11, 15, 15);
+            g.drawLine(23, 11, 15, 15);
+            g.drawLine(7, 11, 7, 20);
+            g.drawLine(23, 11, 23, 20);
+            g.drawLine(7, 20, 15, 24);
+            g.drawLine(23, 20, 15, 24);
+            g.drawLine(15, 15, 15, 24);
+
             g.dispose();
         }
     }
