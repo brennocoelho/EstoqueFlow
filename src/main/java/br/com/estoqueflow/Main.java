@@ -20,7 +20,9 @@ public class Main {
 
         SwingUtilities.invokeLater(() -> {
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                UIManager.setLookAndFeel(
+                        UIManager.getCrossPlatformLookAndFeelClassName()
+                );
             } catch (Exception ignored) {
                 // Mantém o Look and Feel padrão caso o tema do sistema não esteja disponível.
             }
